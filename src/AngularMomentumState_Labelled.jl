@@ -84,7 +84,7 @@ function Zeeman_L0(state::AngularMomentumState_Labelled, state′::AngularMoment
 end
 
 excited(state, state′) = (state.L == 1) && (state′.L == 1) && (state.M == state′.M)
-identity1(state, state′) = (state.N == state′.N == 1) * (state.L == state′.L == 2) && (state.M == state′.M)
+# identity1(state, state′) = (state.N == state′.N == 1) * (state.L == state′.L == 2) && (state.M == state′.M)
 
 # function Zeeman_L2(state::AngularMomentumState_Labelled, state′::AngularMomentumState_Labelled)
 #     L,  N,  M  = unpack(state) 
@@ -141,8 +141,6 @@ function Zeeman_Lx(state::AngularMomentumState_Labelled, state′::AngularMoment
 end
 
 export Zeeman_Lx
-
-
 
 function Zeeman_L1(state::AngularMomentumState_Labelled, state′::AngularMomentumState_Labelled)
     L,  N,  M  = unpack(state)

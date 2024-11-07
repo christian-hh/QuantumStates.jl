@@ -7,10 +7,10 @@ Base.@kwdef struct HarmonicOscillatorState <: BasisState
 end
 export HarmonicOscillatorState
 
-function I(state::HarmonicOscillatorState, state′::HarmonicOscillatorState)
+function Identity(state::HarmonicOscillatorState, state′::HarmonicOscillatorState)
     return δ(state.n, state′.n)
 end
-export I
+export Identity
 
 function T(state::HarmonicOscillatorState, state′::HarmonicOscillatorState)
     n, m, ω = state.n, state.m, state.ω

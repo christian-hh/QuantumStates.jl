@@ -1,4 +1,5 @@
-using Parameters
+abstract type HundsCaseA <: BasisState end
+export HundsCaseA
 
 Base.@kwdef struct HundsCaseA_LinearMolecule <: HundsCaseA
     E::Float64 = 0.0
@@ -270,13 +271,8 @@ function TDM(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecu
             wigner3j(J′, 1, J, -P′, q, P) for q ∈ -1:1
         )
 end
-TDM(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule) = sum(TDM(state, state′, p) for p ∈ -1:1)
+# TDM(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule) = sum(TDM(state, state′, p) for p ∈ -1:1)
 export TDM
-
-function basis_splitting(state, state′)
-    return state.M * (state == state′)
-end
-export basis_splitting
 
 function Zeeman_L(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule, p::Int64)
     """

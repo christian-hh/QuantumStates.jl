@@ -11,10 +11,10 @@ Base.@kwdef struct HarmonicOscillatorState_3D <: BasisState
 end
 export HarmonicOscillatorState_3D
 
-function I(state::HarmonicOscillatorState_3D, state′::HarmonicOscillatorState_3D)
+function Identity(state::HarmonicOscillatorState_3D, state′::HarmonicOscillatorState_3D)
     return (state.nx == state′.nx) * (state.ny == state′.ny) * (state.nz == state′.nz)
 end
-export I
+export Identity
 
 function T(state::HarmonicOscillatorState_3D, state′::HarmonicOscillatorState_3D)
     nx, ny, nz = state.nx, state.ny, state.nz 

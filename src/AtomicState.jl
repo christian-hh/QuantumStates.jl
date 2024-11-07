@@ -101,4 +101,3 @@ function TDM(state::AtomicState, state′::AtomicState, p::Int64)
     end
     return val
 end
-TDM(state, state′) = sum(TDM(state, state′, p) for p ∈ -1:1)

@@ -27,7 +27,7 @@ function make_product_basis(basis1, basis2)
 end
 export make_product_basis
 
-function I(state::ProductState, state′::ProductState)
+function Identity(state::ProductState, state′::ProductState)
     return state == state′
 end
-export I
+export Identity

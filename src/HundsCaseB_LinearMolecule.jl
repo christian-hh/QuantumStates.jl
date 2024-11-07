@@ -39,6 +39,13 @@ export HundsCaseB
 end
 export HundsCaseB_LinearMolecule
 
+function overlap(state::HundsCaseB, state′::HundsCaseB)
+    S, I, Λ, N, J, F, M = unpack(state)
+    S′, I′, Λ′, N′, J′, F′, M′ = unpack(state′)
+    return δ(S,S′) * δ(I,I′) * δ(Λ,Λ′) * δ(N,N′) * δ(J,J′) * δ(F,F′) * δ(M,M′)
+end
+export overlap
+
 function unpack(state::HundsCaseB_LinearMolecule)
     (; v_1, v_2, v_3, S, I, Λ, ℓ, K, N, J, F, M) = state
     return v_1, v_2, v_3, S, I, Λ, ℓ, K, N, J, F, M
@@ -297,8 +304,8 @@ function TDM_vibrational(state::HundsCaseB_LinearMolecule, state′::HundsCaseB_
     v_1′, v_2′, v_3′, S′, I′, Λ′, ℓ′, K′, N′, J′, F′, M′ = unpack(state′)
     return (
         - (-1)^p * (-1)^(F - M) * wigner3j(F, 1, F′, -M, p, M′)
-        * (-1)^(J + I + F′ + 1) * sqrt( (2F + 1) * (2F′ + 1) ) * wigner6j(J, F, I, F′, J′, 1)
-        * (-1)^(N + S + J′ + 1) * sqrt( (2J + 1) * (2J′ + 1) ) * wigner6j(N, J, S, J′, N′, 1)
+        * (-1)^(J + I + F′ + 1) * sqrt( (2F + 1) * (2F′ + 1) ) * wigner6j(J′, F′, I, F, J, 1)
+        * (-1)^(N + S + J′ + 1) * sqrt( (2J + 1) * (2J′ + 1) ) * wigner6j(N′, J′, S, J, N, 1)
         * (-1)^(N - K) * sqrt( (2N + 1) * (2N′ + 1) ) * sum(wigner3j(N, 1, N′, -K, q, K′) for q ∈ -1:1)
     )
 end
@@ -317,7 +324,6 @@ function TDM(state::HundsCaseB_LinearMolecule, state′::HundsCaseB_LinearMolecu
         )
     end
 end
-TDM(state, state′) = sum(TDM(state, state′, p) for p ∈ -1:1)
 TDM(state, state′) = extend_operator(TDM, state, state′, p)
 TDM_vibrational(state, state′, p) = extend_operator(TDM_vibrational, state, state′, p)
 export TDM
@@ -368,24 +374,7 @@ function polarizability(state::HundsCaseB_LinearMolecule, state′::HundsCaseB_L
     val = 0.0
     for L in 0:2
         for P in -L:L
-#             val += (
-#                 (-1)^P
-#                 * (-1)^(F′ - M′) * sqrt( (2F + 1) * (2F′ + 1) ) * wigner3j(F′, K, F, -M′, P, M)
-#                 * (-1)^(F + J′ + I) * wigner6j(J′, F′, I, F, J, K)
-#                 * ((-1)^(N′ + N) + 1) * sqrt( (2N + 1) * (2N′ + 1) )
-#                 * wigner3j(J,  S,  N,  -half(1) + Λ,  half(1), -Λ) 
-#                 * wigner3j(J′, S′, N′, -half(1) + Λ′, half(1), -Λ′)
-#                 * (-1)^(J + S) * sqrt( (2J + 1) * (2J′ + 1) ) 
-# #                 * wigner3j(J′, K, J, -half(1) - Λ′, (Λ′ - Λ), half(1) + Λ)
-#                 * wigner3j(J′, K, J, -half(1) - Λ′, 0, half(1) + Λ)
-#                 * α[K+1] * 𝒫(K, -P, ϵ)
-#                 * (-1)^(Λ + Λ′)
-#             )
             val += (
-#                 * (-1)^(F′ - M′) * wigner3j(F′, K, F, -M′, P, M)
-#                 * (-1)^(F + J′ + K + I) * sqrt( (2F + 1) * (2F′ + 1) ) * wigner6j(J′, F′, I, F, J, K)
-#                 * (-1)^(N′ - Λ′) * sqrt( (2N + 1) * (2N′ + 1) ) * wigner3j(N′, K, N, -Λ′, 0, Λ)
-#                 * (-1)^(J + N′ + K + S) * sqrt( (2J + 1) * (2J′ + 1) ) * wigner6j(N′, J′, S, J, N, K)
                 -(-1)^P
                 * (-1)^(F - M)
                 * wigner3j(F, L, F′, -M, P, M′)
@@ -396,7 +385,6 @@ function polarizability(state::HundsCaseB_LinearMolecule, state′::HundsCaseB_L
                 * (-1)^(N - K) * sqrt( (2N + 1) * (2N′ + 1) )
                 * wigner3j(N, L, N′, -K, 0, K′)
                 * α[L+1] * 𝒫(L, -P, ϵ)
-                # * δ(Λ, Λ′)
             ) 
         end
     end
@@ -404,9 +392,28 @@ function polarizability(state::HundsCaseB_LinearMolecule, state′::HundsCaseB_L
 end
 export polarizability
 
-function basis_splitting(state, state′)
-    return state.M * (state == state′)
+function polarizability_parity(state::HundsCaseB_LinearMolecule, state′::HundsCaseB_LinearMolecule, α, ϵ)
+    v_1,  v_2,  v_3,  S,  I,  Λ,  ℓ,  K,  N,  J,  F,  M  = unpack(state)
+    v_1′, v_2′, v_3′, S′, I′, Λ′, ℓ′, K′, N′, J′, F′, M′ = unpack(state′)
+    val = 0.0
+    if delta(state, state′, :S, :I, :ℓ)
+        for k ∈ 0:2
+            for p ∈ -k:k
+                val += -(
+                    (-1)^(F - M) * wigner3j(F, k, F′, -M, p, M′)
+                    * (-1)^(F′ + J + I + k) * sqrt( (2F + 1) * (2F′ + 1) ) * wigner6j(J, F, I, F′, J′, k)
+                    * (-1)^(N + N′) * sqrt( (2N + 1) * (2N′ + 1) )
+                    * sqrt( (2J + 1) * (2J′ + 1) )
+                    * sum(
+                        wigner3j(J, N, S, K+Σ, -K, -Σ)
+                        * wigner3j(J′, N′, S′, K′+Σ, -K′, -Σ)
+                        * (-1)^(J - Σ) * wigner3j(J, k, J′, -Σ, 0, Σ)
+                        for Σ ∈ -S:S
+                    )
+                ) * α[k+1] * 𝒫(k, -p, ϵ)
+            end
+        end
+    end
+    return val
 end
-export basis_splitting
-
-# function Parity(state, state′)
+export polarizability_parity

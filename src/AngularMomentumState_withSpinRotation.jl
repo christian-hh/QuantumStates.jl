@@ -21,7 +21,7 @@ function unpack(state::AngularMomentumState_withSpinRotation)
 end
 export unpack
 
-function I(state::AngularMomentumState_withSpinRotation, state′::AngularMomentumState_withSpinRotation)
+function Identity(state::AngularMomentumState_withSpinRotation, state′::AngularMomentumState_withSpinRotation)
     J,  N,  S,  M  = unpack(state)
     J′, N′, S′, M′ = unpack(state′)
     if ~δ(J, J′) || ~δ(N, N′) || ~δ(M, M′)
@@ -30,7 +30,7 @@ function I(state::AngularMomentumState_withSpinRotation, state′::AngularMoment
         return 1.0
     end
 end
-export I
+export Identity
 
 function Rotation(state::AngularMomentumState_withSpinRotation, state′::AngularMomentumState_withSpinRotation)
     J,  N,  S,  M  = unpack(state)

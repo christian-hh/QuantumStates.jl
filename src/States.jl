@@ -8,7 +8,7 @@ using PartialWaveFunctions
 
 using HalfIntegers
 using NamedTupleTools
-using LinearAlgebra
+# using LinearAlgebra
 using LoopVectorization
 using NamedTupleTools
 
@@ -166,7 +166,7 @@ import Base: +, -, *, /, ^
 export δ
 
 struct ParameterList
-    param_dict::Dict{Symbol, Float64}
+    param_dict::Dict{Symbol, ComplexF64}
 end
 export ParameterList
 
@@ -246,12 +246,18 @@ export get_tdms_two_bases
 """
     `states` and `states′` must share the same basis.
 """
-function tdms_between_states!(d::Array{ComplexF64, 3}, basis_tdms::Array{ComplexF64, 3}, states::Vector{<:State}, states′::Vector{<:State})
+function tdms_between_states!(d::Array{T, 3}, basis_tdms::Array{T, 3}, states::Vector{<:State}, states′::Vector{<:State}) where T
     for i ∈ eachindex(states), j ∈ eachindex(states′)
         state  = states[i]
         state′ = states′[j]
         basis  = state.basis
         basis′ = state′.basis
+        for p ∈ -1:1
+            d[i,j,p+2] = 0.0
+            for m ∈ eachindex(basis), n ∈ eachindex(basis′)
+                d[i,j,p+2] += conj(state.coeffs[m]) * state′.coeffs[n] * basis_tdms[m,n,p+2]
+            end
+        end
         for p ∈ -1:1
             d[i,j,p+2] = 0.0
             for m ∈ eachindex(basis), n ∈ eachindex(basis′)
@@ -282,7 +288,7 @@ end
 export tdms_between_states
 
 macro params(arg)
-    dict = Dict{Symbol, Float64}()
+    dict = Dict{Symbol, ComplexF64}()
     for x in arg.args
         if x isa Expr
             param_name = x.args[1]
@@ -305,7 +311,7 @@ import Base: getproperty
 function getproperty(p::ParameterList, s::Symbol)
     param_dict = getfield(p, :param_dict)
     if s ∈ keys(param_dict)
-        return getindex(param_dict, s)::Float64
+        return getindex(param_dict, s)
     else
         return getfield(p, s)
     end
@@ -313,7 +319,7 @@ end
 export getproperty
 
 import Base: setproperty!
-function setproperty!(p::ParameterList, s::Symbol, v::Float64)
+function setproperty!(p::ParameterList, s::Symbol, v)
     setindex!(getfield(p, :param_dict), v, s)
 end
 export setproperty!
@@ -425,6 +431,7 @@ function DiagonalOperator(state::BasisState, state′::BasisState)
 end
 export DiagonalOperator
 
+import LinearAlgebra: ⋅
 function calculate_state_overlaps!(states, states′, overlaps)
     for i ∈ eachindex(states)
         for j ∈ eachindex(states′)

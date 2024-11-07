@@ -30,7 +30,7 @@ function L(state::AngularMomentumState_Labelled_v1, state′::AngularMomentumSta
     return δ(L, L′) * δ(N, N′) * δ(M, M′) * L
 end
 
-function I(state::AngularMomentumState_Labelled_v1, state′::AngularMomentumState_Labelled_v1)
+function Identity(state::AngularMomentumState_Labelled_v1, state′::AngularMomentumState_Labelled_v1)
     L,  N,  M  = unpack(state)
     L′, N′, M′ = unpack(state′)
     if ~δ(L, L′) || ~δ(N, N′) || ~δ(M, M′)
@@ -39,7 +39,7 @@ function I(state::AngularMomentumState_Labelled_v1, state′::AngularMomentumSta
         return 1.0
     end
 end
-export I
+export Identity
 
 function Rotation(state::AngularMomentumState_Labelled_v1, state′::AngularMomentumState_Labelled_v1)
     L,  N,  M  = unpack(state)
@@ -88,7 +88,7 @@ function Zeeman_L0(state::AngularMomentumState_Labelled_v1, state′::AngularMom
     end
 end
 
-excited(state, state′) = (state.L == 1) && (state′.L == 1) && (state.M == state′.M)
+# excited(state, state′) = (state.L == 1) && (state′.L == 1) && (state.M == state′.M)
 identity1(state, state′) = (state.N == state′.N == 1) * (state.L == state′.L == 2) && (state.M == state′.M)
 
 function Zeeman_L2(state::AngularMomentumState_Labelled_v1, state′::AngularMomentumState_Labelled_v1)

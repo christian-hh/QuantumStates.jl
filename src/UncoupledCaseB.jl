@@ -1,5 +1,3 @@
-using Parameters
-
 # abstract type HundsCaseB_Decoupled <: BasisState end
 # export HundsCaseB_Decoupled
 
