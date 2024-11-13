@@ -347,17 +347,33 @@ function Stark(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMole
     v_1,  v_2,  ℓ,  v_3,  Λ,  K,  I,  S,  Σ,  J,  P,  F,  M  = unpack(state)
     v_1′, v_2′, ℓ′, v_3′, Λ′, K′, I′, S′, Σ′, J′, P′, F′, M′ = unpack(state′)
     
-    if delta(state, state′,:I,:M)
+    if delta(state, state′,:ℓ)
         return 0.0
     else
         return (
-            (-1)^p * (-1)^(F-M) * wigner3j_(F,1,F′,-M,p,M′) * (-1)^(F′+J+I+1) * sqrt((2F+1)*(2F′+1)) *
+            -(-1)^p * (-1)^(F-M) * wigner3j_(F,1,F′,-M,p,M′) * (-1)^(F′+J+I+1) * sqrt((2F+1)*(2F′+1)) *
             wigner6j_(J′,F′,I,F,J,1) * (-1)^(J-P) * wigner3j_(J,1,J′,-P,0,P′) * sqrt((2J+1)*(2J′+1))
             )
     end
 end
 export Stark
 
+#=function Stark(state::HundsCaseB_LinearMolecule, state′::HundsCaseB_LinearMolecule)
+    # Hirota, equation (2.5.35)
+    v_1,  v_2,  v_3,  S,  I,  Λ,  ℓ,  K,  N,  J,  F,  M  = unpack(state)
+    v_1′, v_2′, v_3′, S′, I′, Λ′, ℓ′, K′, N′, J′, F′, M′ = unpack(state′)
+    if ~delta(state, state′, :ℓ)
+        return 0.0
+    else
+        return (
+                - (-1)^(F - M) * wigner3j(F, 1, F′, -M, 0, M′)
+                * (-1)^(J + I + F′ + 1) * sqrt( (2F + 1) * (2F′ + 1) ) * wigner6j(J′, F′, I, F, J, 1)
+                * (-1)^(N + S + J′ + 1) * sqrt( (2J + 1) * (2J′ + 1) ) * wigner6j(N′, J′, S, J, N, 1)
+                * (-1)^(N - K) * sqrt( (2N + 1) * (2N′ + 1) ) * wigner3j(N, 1, N′, -K, 0, K′) 
+        )
+    end
+end
+export Stark=#
 
 # def ZeemanParityZ_even_aBJ(K0,Sigma0,P0,J0,F0,M0,K1,Sigma1,P1,J1,F1,M1,S=1/2,I=1/2):
 #     if kronecker(K0,K1)*(not kronecker(M0,M1)):
