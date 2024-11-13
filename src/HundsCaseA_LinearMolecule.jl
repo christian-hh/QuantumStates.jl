@@ -347,7 +347,7 @@ function Stark(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMole
     v_1,  v_2,  ℓ,  v_3,  Λ,  K,  I,  S,  Σ,  J,  P,  F,  M  = unpack(state)
     v_1′, v_2′, ℓ′, v_3′, Λ′, K′, I′, S′, Σ′, J′, P′, F′, M′ = unpack(state′)
     
-    if delta(state, state′,:I)
+    if delta(state, state′,:I,:M)
         return 0.0
     else
         return (
