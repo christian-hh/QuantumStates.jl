@@ -346,15 +346,11 @@ function Stark(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMole
     """
 v_1,  v_2,  ℓ,  v_3,  Λ,  K,  I,  S,  Σ,  J,  P,  F,  M  = unpack(state)
 v_1′, v_2′, ℓ′, v_3′, Λ′, K′, I′, S′, Σ′, J′, P′, F′, M′ = unpack(state′)
-
-    if delta(state, state′)
-        return 0.0
-    else
+    
         return (
             (-1)^p * (-1)^(F-M) * wigner3j_(F,1,F′,-M,p,M′) * (-1)^(F′+J+I+1) * sqrt((2F+1)*(2F′+1)) *
             wigner6j_(J′,F′,I,F,J,1) * (-1)^(J-P) * wigner3j_(J,1,J′,-P,0,P′) * sqrt((2J+1)*(2J′+1))
             )
-    end
 end
 export Stark
 
