@@ -340,6 +340,25 @@ v_1′, v_2′, ℓ′, v_3′, Λ′, K′, I′, S′, Σ′, J′, P′, F′
 end
 export Zeeman_gl′
 
+function Stark(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule, p::Int64)
+    """
+    B&C 8.429
+    """
+v_1,  v_2,  ℓ,  v_3,  Λ,  K,  I,  S,  Σ,  J,  P,  F,  M  = unpack(state)
+v_1′, v_2′, ℓ′, v_3′, Λ′, K′, I′, S′, Σ′, J′, P′, F′, M′ = unpack(state′)
+
+    if delta(state, state′)
+        return 0.0
+    else
+        return (
+            (-1)^p * (-1)^(F-M) * wigner3j_(F,1,F′,-M,p,M′) * (-1)^(F′+J+I+1) * sqrt((2F+1)*(2F′+1)) *
+            wigner6j_(J′,F′,I,F,J,1) * (-1)^(J-P) * wigner3j_(J,1,J′,-P,0,P′) * sqrt((2J+1)*(2J′+1))
+            )
+    end
+end
+export Stark
+
+
 # def ZeemanParityZ_even_aBJ(K0,Sigma0,P0,J0,F0,M0,K1,Sigma1,P1,J1,F1,M1,S=1/2,I=1/2):
 #     if kronecker(K0,K1)*(not kronecker(M0,M1)):
 #         return 0
