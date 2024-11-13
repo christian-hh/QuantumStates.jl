@@ -340,7 +340,7 @@ v_1′, v_2′, ℓ′, v_3′, Λ′, K′, I′, S′, Σ′, J′, P′, F′
 end
 export Zeeman_gl′
 
-function Stark(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule, p::Int64)
+function Stark(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
     """
     B&C 8.429
     """
@@ -351,7 +351,7 @@ function Stark(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMole
         return 0.0
     else
         return (
-            -(-1)^p * (-1)^(F-M) * wigner3j(F,1,F′,-M,p,M′) * (-1)^(F′+J+I+1) * sqrt((2F+1)*(2F′+1)) *
+            - (-1)^(F-M) * wigner3j(F,1,F′,-M,0,M′) * (-1)^(F′+J+I+1) * sqrt((2F+1)*(2F′+1)) *
             wigner6j(J′,F′,I,F,J,1) * (-1)^(J-P) * wigner3j(J,1,J′,-P,0,P′) * sqrt((2J+1)*(2J′+1))
             )
     end
