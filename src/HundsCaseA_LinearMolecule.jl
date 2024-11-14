@@ -113,7 +113,7 @@ function ΛDoubling_q(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_Lin
 end
 export ΛDoubling_q
 
-function ΛDoubling_q_Delta (state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
+function ΛDoubling_q_Delta(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
     """
     (Λ_+^2 J_-^2) term
     See Li & Coxon (1995)
