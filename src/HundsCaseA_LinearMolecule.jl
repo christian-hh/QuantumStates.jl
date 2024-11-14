@@ -125,7 +125,7 @@ function ΛDoubling_q_Delta(state::HundsCaseA_LinearMolecule, state′::HundsCas
         (1 / (2 * sqrt(6))) *
         sqrt( (2J - 1) * (2J) * (2J + 1) * (2J + 2) * (2J + 3) ) *
         sum(
-            δ(Λ′, Λ + 2q) *
+            δ(Λ′, Λ + 4q) *
             wigner3j_(J, 4, J′, -P, -4q, P′)
             for q ∈ (-1,1)
         )
