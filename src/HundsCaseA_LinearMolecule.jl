@@ -109,11 +109,31 @@ function ΛDoubling_q(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_Lin
             wigner3j_(J, 2, J′, -P, -2q, P′)
             for q ∈ (-1,1)
         )
+    ) * δ(ℓ,ℓ′) * δ(J,J′) * δ(F,F′) * δ(M,M′) * δ(Σ,Σ′)
+end
+export ΛDoubling_q
+
+function ΛDoubling_q_Delta_1(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
+    """
+    (Λ_+^2 J_-^2) term
+    See Li & Coxon (1995)
+    """
+    v_1,  v_2,  ℓ,  v_3,  Λ,  K,  I,  S,  Σ,  J,  P,  F,  M  = unpack(state)
+    v_1′, v_2′, ℓ′, v_3′, Λ′, K′, I′, S′, Σ′, J′, P′, F′, M′ = unpack(state′)
+    return (
+        (-1)^(J - P) *
+        (1 / (2 * sqrt(6))) *
+        sqrt( (2J - 1) * (2J) * (2J + 1) * (2J + 2) * (2J + 3) ) *
+        sum(
+            δ(Λ′, Λ + 4q) *
+            wigner3j_(J, 2, J′, -P, -2q, P′)
+            for q ∈ (-1,1)
+        )
     ) * δ(ℓ,ℓ′) * δ(J,J′) * δ(F,F′) * δ(M,M′) #* δ(Σ,Σ′)
 end
 export ΛDoubling_q
 
-function ΛDoubling_q_Delta(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
+function ΛDoubling_q_Delta_2(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
     """
     (Λ_+^2 J_-^2) term
     See Li & Coxon (1995)
