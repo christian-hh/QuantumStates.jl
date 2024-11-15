@@ -109,7 +109,7 @@ function ΛDoubling_q(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_Lin
             wigner3j_(J, 2, J′, -P, -2q, P′)
             for q ∈ (-1,1)
         )
-    ) * δ(ℓ,ℓ′) * δ(Σ,Σ′) * δ(J,J′) * δ(F,F′) * δ(M,M′)
+    ) * δ(ℓ,ℓ′) * δ(J,J′) * δ(F,F′) * δ(M,M′) #* δ(Σ,Σ′)
 end
 export ΛDoubling_q
 
