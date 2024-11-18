@@ -115,6 +115,8 @@ export ΛDoubling_q
 
 function ΛDoubling_q_Delta_1(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
     """
+    guess at extension of above term to a triplet delta 1 state, just based on the form and selection rules
+    probably J dependence is not correct yet
     (Λ_+^2 J_-^2) term
     See Li & Coxon (1995)
     """
@@ -135,6 +137,8 @@ export ΛDoubling_q
 
 function ΛDoubling_q_Delta_2(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
     """
+    guess at extension of above term to a triplet delta 2 state, just based on the form and selection rules
+    probably J dependence is not correct yet
     (Λ_+^2 J_-^2) term
     See Li & Coxon (1995)
     """
