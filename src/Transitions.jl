@@ -90,7 +90,7 @@ function compute_transitions_test(states::Vector{<:State}, states′::Vector{<:S
     end
     return transitions
 end
-export compute_transitions
+export compute_transitions_test
 
 ground_state(transition::Transition) = transition.ground_state
 excited_state(transition::Transition) = transition.excited_state
