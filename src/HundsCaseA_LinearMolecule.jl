@@ -96,7 +96,7 @@ export SpinUncoupling
 function ΛDoubling_q(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
     """
     (Λ_+^2 J_-^2) term
-    See Li & Coxon (1995)
+    See Li & Coxon (1995) or B&C 8.402-9.66
     """
     v_1,  v_2,  ℓ,  v_3,  Λ,  K,  I,  S,  Σ,  J,  P,  F,  M  = unpack(state)
     v_1′, v_2′, ℓ′, v_3′, Λ′, K′, I′, S′, Σ′, J′, P′, F′, M′ = unpack(state′)
@@ -116,9 +116,7 @@ export ΛDoubling_q
 function ΛDoubling_q_Delta_1(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
     """
     guess at extension of above term to a triplet delta 1 state, just based on the form and selection rules
-    probably J dependence is not correct yet
-    (Λ_+^2 J_-^2) term
-    See Li & Coxon (1995)
+    - j dependence from B&C 5.134 (same as pi-state lambda doubling here, I think?)
     """
     v_1,  v_2,  ℓ,  v_3,  Λ,  K,  I,  S,  Σ,  J,  P,  F,  M  = unpack(state)
     v_1′, v_2′, ℓ′, v_3′, Λ′, K′, I′, S′, Σ′, J′, P′, F′, M′ = unpack(state′)
@@ -138,7 +136,7 @@ export ΛDoubling_q
 function ΛDoubling_q_Delta_2(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
     """
     guess at extension of above term to a triplet delta 2 state, just based on the form and selection rules
-    probably J dependence is not correct yet
+    - j dependence from B&C 5.134: I think this is right with a faster J dependence, but a little odd way of making these matrix elements so idk
     (Λ_+^2 J_-^2) term
     See Li & Coxon (1995)
     """
