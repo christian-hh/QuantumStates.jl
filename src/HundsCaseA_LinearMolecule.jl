@@ -117,6 +117,7 @@ function ΛDoubling_q_Delta_1(state::HundsCaseA_LinearMolecule, state′::HundsC
     """
     guess at extension of above term to a triplet delta 1 state, just based on the form and selection rules
     - j dependence from B&C 5.134 (same as pi-state lambda doubling here, I think?)
+    - based on table VII in Brown, Cheung and Merer 1987, I think this is basially approximating the ~o term, but not 100% sure of this yet
     """
     v_1,  v_2,  ℓ,  v_3,  Λ,  K,  I,  S,  Σ,  J,  P,  F,  M  = unpack(state)
     v_1′, v_2′, ℓ′, v_3′, Λ′, K′, I′, S′, Σ′, J′, P′, F′, M′ = unpack(state′)
