@@ -247,12 +247,12 @@ function Hyperfine_IF(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_Lin
 end
 export Hyperfine_IF
 
-function Hyperfine_I_J(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
+function Hyperfine_IJ(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
     v_1,  v_2,  ℓ,  v_3,  Λ,  K,  I,  S,  Σ,  J,  P,  F,  M  = unpack(state)
     v_1′, v_2′, ℓ′, v_3′, Λ′, K′, I′, S′, Σ′, J′, P′, F′, M′ = unpack(state′)
-    return δ(F, F′) *(-1)^(J′+F+I)*wigner6j_(I, J′, F, J, I, 1)*sqrt(J*(J+1)*(2J+1)*I*(I+1)*(2I+1))
+    return δ(F, F′)*δ(J, J′) *(-1)^(J′+F+I)*wigner6j_(I, J′, F, J, I, 1)*sqrt(J*(J+1)*(2J+1)*I*(I+1)*(2I+1))
 end
-export Hyperfine_I_J
+export Hyperfine_IJ
     
 function Hyperfine_Dipolar_c(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
     v_1,  v_2,  ℓ,  v_3,  Λ,  K,  I,  S,  Σ,  J,  P,  F,  M  = unpack(state)
