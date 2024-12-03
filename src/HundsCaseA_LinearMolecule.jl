@@ -250,7 +250,7 @@ export Hyperfine_IF
 function Hyperfine_IJ(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
     v_1,  v_2,  ℓ,  v_3,  Λ,  K,  I,  S,  Σ,  J,  P,  F,  M  = unpack(state)
     v_1′, v_2′, ℓ′, v_3′, Λ′, K′, I′, S′, Σ′, J′, P′, F′, M′ = unpack(state′)
-    return δ(F, F′)*δ(J, J′) *δ(M, M′)*(-1)^(J′+F+I)*wigner6j_(I, J′, F, J, I, 1)*sqrt(J*(J+1)*(2J+1)*I*(I+1)*(2I+1))
+    return δ(F, F′)*δ(J, J′) *δ(M, M′)*(-1)^(J′+F+I)*wigner6j_(I, J′, F, J, I, 1)*sqrt(J*(J+1)*(2J+1)*I*(I+1)*(2I+1))*wigner3j(J, 1, J′, -P, 0, P′)
 end
 export Hyperfine_IJ
     
