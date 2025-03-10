@@ -161,6 +161,18 @@ function ℓDoubling(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_Line
     )
     return (term1 - term2) * δ(Λ,Λ′) * δ(J,J′) * δ(F,F′) * δ(M,M′)
 end
+
+function gK_nonadiabatic(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
+    """
+    """
+    v_1,  v_2,  ℓ,  v_3,  Λ,  K,  I,  S,  Σ,  J,  P,  F,  M  = unpack(state)
+    v_1′, v_2′, ℓ′, v_3′, Λ′, K′, I′, S′, Σ′, J′, P′, F′, M′ = unpack(state′)
+    if ~delta(state, state′, :ℓ, :Λ, :K, :Σ, :J, :P, :F, :M)
+        return 0.0
+    else
+        return K * Λ
+    end
+end
         
 function Hyperfine_IL(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
     # Brown and Carrington, eq. (8.372)
@@ -251,11 +263,15 @@ export Hyperfine_Dipolar_d
 
 function RennerTeller(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
     """
-    See Brown (1975).
+    See Coxon & Li (1995).
     """
     v_1,  v_2,  ℓ,  v_3,  Λ,  K,  I,  S,  Σ,  J,  P,  F,  M  = unpack(state)
     v_1′, v_2′, ℓ′, v_3′, Λ′, K′, I′, S′, Σ′, J′, P′, F′, M′ = unpack(state′)
-    return (
+    # return (
+    #     sum(((v_2 + 1)^2 - K^2)^(1/2) * δ(Λ,Λ′+2q) * δ(ℓ,ℓ′-2q) for q ∈ (-1,1))
+    # ) *
+    # δ(Σ,Σ′) * δ(J,J′) * δ(F,F′) * δ(M,M′)
+    return (1/2) * (
         sum(((v_2 + 1)^2 - K^2)^(1/2) * δ(Λ,Λ′+2q) * δ(ℓ,ℓ′-2q) for q ∈ (-1,1))
     ) *
     δ(Σ,Σ′) * δ(J,J′) * δ(F,F′) * δ(M,M′)

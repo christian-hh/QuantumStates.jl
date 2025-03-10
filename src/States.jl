@@ -162,6 +162,10 @@ import Base: +, -, *, /, ^
 #     (args...; kwargs...) -> f(args...; kwargs...) + c
 #     +(a, b) = +(b, a)`
 
+*(c, state) = State(0., state.basis, c .* state.coeffs, 0)
+
++(state, state′) = State(0., state.basis, state.coeffs .+ state′.coeffs, 0)
+
 δ(x,y) = ==(x,y)
 export δ
 
@@ -258,12 +262,6 @@ function tdms_between_states!(d::Array{T, 3}, basis_tdms::Array{T, 3}, states::V
                 d[i,j,p+2] += conj(state.coeffs[m]) * state′.coeffs[n] * basis_tdms[m,n,p+2]
             end
         end
-        for p ∈ -1:1
-            d[i,j,p+2] = 0.0
-            for m ∈ eachindex(basis), n ∈ eachindex(basis′)
-                d[i,j,p+2] += conj(state.coeffs[m]) * state′.coeffs[n] * basis_tdms[m,n,p+2]
-            end
-        end
     end
     return nothing
 end
@@ -279,7 +277,9 @@ function tdms_between_states(states::Vector{<:State}, states′::Vector{<:State}
         for p ∈ -1:1
             d[i,j,p+2] = 0.0
             for m ∈ eachindex(basis), n ∈ eachindex(basis′)
-                d[i,j,p+2] += conj(state.coeffs[m]) * state′.coeffs[n] * TDM(basis[m], basis′[n], p)
+                if norm(state.coeffs[m]) > 1e-6 && norm(state′.coeffs[n]) > 1e-6
+                    d[i,j,p+2] += conj(state.coeffs[m]) * state′.coeffs[n] * TDM(basis[m], basis′[n], p)
+                end
             end
         end
     end
@@ -514,6 +514,7 @@ end
 
 function subspace(basis::Vector{<:BasisState}, QN_bounds)
     subspace_basis = typeof(basis[1])[]
+    subspace_idxs = Int64[]
     QNs = keys(QN_bounds)
     add_to_subspace = ones(Bool, length(basis))
     for QN ∈ QNs
@@ -526,9 +527,10 @@ function subspace(basis::Vector{<:BasisState}, QN_bounds)
     for i ∈ eachindex(basis)
         if add_to_subspace[i]
             push!(subspace_basis, basis[i])
+            push!(subspace_idxs, i)
         end
     end
-    return subspace_basis
+    return subspace_idxs, subspace_basis
 end
 export subspace
 

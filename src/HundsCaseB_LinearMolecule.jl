@@ -212,15 +212,15 @@ export ℓDoubling
 # end
 # export Hyperfine_SK
 
-function Stark(state::HundsCaseB_LinearMolecule, state′::HundsCaseB_LinearMolecule)
+function Stark(state::HundsCaseB_LinearMolecule, state′::HundsCaseB_LinearMolecule, p::Int64)
     # Hirota, equation (2.5.35)
     v_1,  v_2,  v_3,  S,  I,  Λ,  ℓ,  K,  N,  J,  F,  M  = unpack(state)
     v_1′, v_2′, v_3′, S′, I′, Λ′, ℓ′, K′, N′, J′, F′, M′ = unpack(state′)
-    if ~delta(state, state′, :ℓ)
+    if ~delta(state, state′, :ℓ, :v_1, :v_2, :v_3)
         return 0.0
     else
         return (
-                - (-1)^(F - M) * wigner3j(F, 1, F′, -M, 0, M′)
+                - (-1)^p * (-1)^(F - M) * wigner3j(F, 1, F′, -M, p, M′)
                 * (-1)^(J + I + F′ + 1) * sqrt( (2F + 1) * (2F′ + 1) ) * wigner6j(J′, F′, I, F, J, 1)
                 * (-1)^(N + S + J′ + 1) * sqrt( (2J + 1) * (2J′ + 1) ) * wigner6j(N′, J′, S, J, N, 1)
                 * (-1)^(N - K) * sqrt( (2N + 1) * (2N′ + 1) ) * wigner3j(N, 1, N′, -K, 0, K′) 
@@ -334,7 +334,7 @@ export TDM_vibrational
 
 function 𝒫(K,P,ϵ)
     val = 0.0
-    ϵm1, ϵ0, ϵp1 = ϵ
+    ϵm1, ϵ0, ϵp1 = ϵ[1], ϵ[2], ϵ[3]
     if P == 0
         if K == 0
             val += 1.0

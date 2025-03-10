@@ -343,6 +343,53 @@ export add_operator_matrix!
 end
 
 """
+Functions to make a matrix from an operator.
+"""
+function create_matrix_for_states(operator_matrix, states)
+    matrix = zeros(ComplexF64, length(states), length(states))
+    for (i, state) in enumerate(states)
+        for (j, state′) in enumerate(states)
+            for (k, basis_state) in enumerate(state.basis)
+                for (l, basis_state′) in enumerate(state′.basis)
+                    matrix[i,j] += conj(state.coeffs[k]) * state′.coeffs[l] * operator_matrix[k,l]
+                end
+            end
+        end
+    end
+    return matrix
+end
+export create_matrix_for_states
+
+"""
+Make an operator apply to "state" rather than "basis state".
+"""
+function extend_operator(operator::T, state, state′, args...) where {T}
+    val = zero(ComplexF64)
+    for (i, basis_state) in enumerate(state.basis)
+        for (j, basis_state′) in enumerate(state′.basis)
+            val += conj(state.coeffs[i]) * state′.coeffs[j] * operator(basis_state, basis_state′, args...)
+        end
+    end
+    return val
+end
+export extend_operator
+
+function operator_to_matrix(A, states)
+    """
+    Write an operator as a matrix in basis {states}.
+    """
+    n_states = length(states)
+    A_mat = zeros(ComplexF64, n_states, n_states)
+    for i in 1:n_states
+        for j in 1:n_states
+            A_mat[i,j] = extend_operator(A, states[i], states[j])
+        end
+    end
+    return A_mat
+end
+export operator_to_matrix
+
+"""
     full_evaluate!(H::Hamiltonian)
 
     Additionally reevaluates the matrix elements of all operators in the Hamiltonian. 
@@ -753,8 +800,8 @@ function scan_parameters_v2(H, scan_values::T, iterator::F1, H_func!::F2, output
         end        
 
         @async begin
-            for (i,scan_values_partition) ∈ enumerate(partitions)
-                pid = i+1
+            for (i, scan_values_partition) ∈ enumerate(partitions)
+                pid = workers[i]
                 # tasks[pid] = remotecall(single_scan, pid, H, H_func!, scan_values_partition, channel, n_params, output_type, output_func)
                 tasks[i] = @spawnat pid single_scan(H, H_func!, scan_values_partition, channel, n_params, output_type, output_func)
                 # data = single_scan(H, H_func!, scan_values_partition, channel, n_params, output_type, output_func)
