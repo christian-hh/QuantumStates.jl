@@ -39,6 +39,36 @@ end
 
 export compute_transitions
 
+function compute_transitions_test(states::Vector{<:State}, states′::Vector{<:State}, p; threshold=1e-8, compute_tdms=true)
+    transitions = Transition[]
+    basis1 = states[1].basis
+    basis2 = states′[1].basis    
+
+    tdms = zeros(length(basis1), length(basis2))
+    if compute_tdms
+        for (i, basis_state) ∈ enumerate(basis1)
+            for (j, basis_state′) ∈ enumerate(basis2)
+                tdms[i,j] = TDM(basis_state, basis_state′, p)
+            end
+        end
+    end
+
+    for state ∈ states
+        for state′ ∈ states′
+            if state′.E > state.E
+                tdm = state.coeffs ⋅ (tdms * state′.coeffs)
+                f = state′.E - state.E
+                if (norm(tdm) > threshold || ~compute_tdms) && abs(f) > 1
+                    transition = Transition(state, state′, f, tdm)
+                    push!(transitions, transition)
+                end
+            end
+        end
+    end
+    return transitions
+end
+export compute_transitions_test
+
 ground_state(transition::Transition) = transition.ground_state
 excited_state(transition::Transition) = transition.excited_state
 frequency(transition::Transition) = transition.frequency

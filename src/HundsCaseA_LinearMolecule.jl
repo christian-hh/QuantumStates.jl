@@ -96,7 +96,7 @@ export SpinUncoupling
 function ΛDoubling_q(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
     """
     (Λ_+^2 J_-^2) term
-    See Li & Coxon (1995)
+    See Li & Coxon (1995) or B&C 8.402-9.66
     """
     v_1,  v_2,  ℓ,  v_3,  Λ,  K,  I,  S,  Σ,  J,  P,  F,  M  = unpack(state)
     v_1′, v_2′, ℓ′, v_3′, Λ′, K′, I′, S′, Σ′, J′, P′, F′, M′ = unpack(state′)
@@ -107,6 +107,49 @@ function ΛDoubling_q(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_Lin
         sum(
             δ(Λ′, Λ + 2q) *
             wigner3j_(J, 2, J′, -P, -2q, P′)
+            for q ∈ (-1,1)
+        )
+    ) * δ(ℓ,ℓ′) * δ(J,J′) * δ(F,F′) * δ(M,M′) * δ(Σ,Σ′)
+end
+export ΛDoubling_q
+
+function ΛDoubling_q_Delta_1(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
+    """
+    guess at extension of above term to a triplet delta 1 state, just based on the form and selection rules
+    - j dependence from B&C 5.134 (same as pi-state lambda doubling here, I think?)
+    - based on table VII in Brown, Cheung and Merer 1987, I think this is basially approximating the ~o term, but not 100% sure of this yet
+    """
+    v_1,  v_2,  ℓ,  v_3,  Λ,  K,  I,  S,  Σ,  J,  P,  F,  M  = unpack(state)
+    v_1′, v_2′, ℓ′, v_3′, Λ′, K′, I′, S′, Σ′, J′, P′, F′, M′ = unpack(state′)
+    return (
+        (-1)^(J - P) *
+        (1 / (2 * sqrt(6))) *
+        sqrt( (2J - 1) * (2J) * (2J + 1) * (2J + 2) * (2J + 3) ) *
+        sum(
+            δ(Λ′, Λ + 4q) *
+            wigner3j_(J, 2, J′, -P, -2q, P′)
+            for q ∈ (-1,1)
+        )
+    ) * δ(ℓ,ℓ′) * δ(J,J′) * δ(F,F′) * δ(M,M′) #* δ(Σ,Σ′)
+end
+export ΛDoubling_q
+
+function ΛDoubling_q_Delta_2(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
+    """
+    guess at extension of above term to a triplet delta 2 state, just based on the form and selection rules
+    - j dependence from B&C 5.134: I think this is right with a faster J dependence, but a little odd way of making these matrix elements so idk
+    (Λ_+^2 J_-^2) term
+    See Li & Coxon (1995)
+    """
+    v_1,  v_2,  ℓ,  v_3,  Λ,  K,  I,  S,  Σ,  J,  P,  F,  M  = unpack(state)
+    v_1′, v_2′, ℓ′, v_3′, Λ′, K′, I′, S′, Σ′, J′, P′, F′, M′ = unpack(state′)
+    return (
+        (-1)^(J - P) *
+        (1 / (2 * sqrt(6))) *
+        sqrt( (2J - 1) * (2J) * (2J + 1) * (2J + 2) * (2J + 3) ) *
+        sum(
+            δ(Λ′, Λ + 4q) *
+            wigner3j_(J, 4, J′, -P, -4q, P′)
             for q ∈ (-1,1)
         )
     ) * δ(ℓ,ℓ′) * δ(Σ,Σ′) * δ(J,J′) * δ(F,F′) * δ(M,M′)
@@ -215,6 +258,13 @@ function Hyperfine_IF(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_Lin
     end
 end
 export Hyperfine_IF
+
+function Hyperfine_IJ(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
+    v_1,  v_2,  ℓ,  v_3,  Λ,  K,  I,  S,  Σ,  J,  P,  F,  M  = unpack(state)
+    v_1′, v_2′, ℓ′, v_3′, Λ′, K′, I′, S′, Σ′, J′, P′, F′, M′ = unpack(state′)
+    return δ(F, F′)*δ(J, J′) *δ(M, M′)*(-1)^(J′+F+I)*wigner6j_(I, J′, F, J, I, 1)*sqrt(J*(J+1)*(2J+1)*I*(I+1)*(2I+1))
+end
+export Hyperfine_IJ
     
 function Hyperfine_Dipolar_c(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
     v_1,  v_2,  ℓ,  v_3,  Λ,  K,  I,  S,  Σ,  J,  P,  F,  M  = unpack(state)
@@ -355,6 +405,41 @@ v_1′, v_2′, ℓ′, v_3′, Λ′, K′, I′, S′, Σ′, J′, P′, F′
     end
 end
 export Zeeman_gl′
+
+function Stark(state::HundsCaseA_LinearMolecule, state′::HundsCaseA_LinearMolecule)
+    """
+    B&C 8.429
+    """
+    v_1,  v_2,  ℓ,  v_3,  Λ,  K,  I,  S,  Σ,  J,  P,  F,  M  = unpack(state)
+    v_1′, v_2′, ℓ′, v_3′, Λ′, K′, I′, S′, Σ′, J′, P′, F′, M′ = unpack(state′)
+    
+    if ~delta(state, state′,:ℓ)
+        return 0.0
+    else
+        return (
+            - (-1)^(F-M) * wigner3j(F,1,F′,-M,0,M′) * (-1)^(F′+J+I+1) * sqrt((2F+1)*(2F′+1)) *
+            wigner6j(J′,F′,I,F,J,1) * (-1)^(J-P) * wigner3j(J,1,J′,-P,0,P′) * sqrt((2J+1)*(2J′+1))
+            )
+    end
+end
+export Stark
+
+#=function Stark(state::HundsCaseB_LinearMolecule, state′::HundsCaseB_LinearMolecule)
+    # Hirota, equation (2.5.35)
+    v_1,  v_2,  v_3,  S,  I,  Λ,  ℓ,  K,  N,  J,  F,  M  = unpack(state)
+    v_1′, v_2′, v_3′, S′, I′, Λ′, ℓ′, K′, N′, J′, F′, M′ = unpack(state′)
+    if ~delta(state, state′, :ℓ)
+        return 0.0
+    else
+        return (
+                - (-1)^(F - M) * wigner3j(F, 1, F′, -M, 0, M′)
+                * (-1)^(J + I + F′ + 1) * sqrt( (2F + 1) * (2F′ + 1) ) * wigner6j(J′, F′, I, F, J, 1)
+                * (-1)^(N + S + J′ + 1) * sqrt( (2J + 1) * (2J′ + 1) ) * wigner6j(N′, J′, S, J, N, 1)
+                * (-1)^(N - K) * sqrt( (2N + 1) * (2N′ + 1) ) * wigner3j(N, 1, N′, -K, 0, K′) 
+        )
+    end
+end
+export Stark=#
 
 # def ZeemanParityZ_even_aBJ(K0,Sigma0,P0,J0,F0,M0,K1,Sigma1,P1,J1,F1,M1,S=1/2,I=1/2):
 #     if kronecker(K0,K1)*(not kronecker(M0,M1)):
