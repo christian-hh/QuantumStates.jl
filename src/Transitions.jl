@@ -6,42 +6,18 @@ mutable struct Transition
 end
 export Transition
 
-function compute_transitions(H::Hamiltonian, p, threshold=1e-8)
-    transitions = Transition[]
-    
-    for (i, basis_state) ∈ enumerate(H.basis)
-        for (j, basis_state′) ∈ enumerate(H.basis)
-            H.tdms[i,j,p] = TDM(basis_state, basis_state′, p)
-        end
-    end
-            
-    for (i, state) ∈ enumerate(H.states)
-        for (j, state′) ∈ enumerate(H.states)
-            if state′.E > state.E
-                tdm = state.coeffs ⋅ (H.tdms * state′.coeffs)
-                if norm(tdm) > threshold
-                    transition = Transition(state, state′, state′.E - state.E, tdm)
-                    push!(transitions, transition)
-                    H.tdms
-                end
-            end
-        end
-    end
-    return transitions
-end
-
 """
     Compute the transitions between two sets of states, `states` and `states′`.
 """
-function compute_transitions(states::Vector{<:State}, states′::Vector{<:State}, p; threshold=1e-8, compute_tdms=true)
+function compute_transitions(states::Vector{<:State}, states′::Vector{<:State}, ϵ; threshold=1e-8)
     transitions = Transition[]
     basis = states[1].basis
 
     tdms = zeros(length(basis), length(basis))
-    if compute_tdms
+    for p ∈ -1:1
         for (i, basis_state) ∈ enumerate(basis)
             for (j, basis_state′) ∈ enumerate(basis)
-                tdms[i,j] = TDM(basis_state, basis_state′, p)
+                tdms[i,j] += ϵ[p+2] * TDM(basis_state, basis_state′, p)
             end
         end
     end
@@ -51,7 +27,7 @@ function compute_transitions(states::Vector{<:State}, states′::Vector{<:State}
             if state′.E > state.E
                 tdm = state.coeffs ⋅ (tdms * state′.coeffs)
                 f = state′.E - state.E
-                if (norm(tdm) > threshold || ~compute_tdms) && abs(f) > 1
+                if norm(tdm) > threshold && abs(f) > 1
                     transition = Transition(state, state′, f, tdm)
                     push!(transitions, transition)
                 end
@@ -60,6 +36,7 @@ function compute_transitions(states::Vector{<:State}, states′::Vector{<:State}
     end
     return transitions
 end
+
 export compute_transitions
 
 ground_state(transition::Transition) = transition.ground_state

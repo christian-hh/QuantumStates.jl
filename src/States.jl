@@ -162,9 +162,9 @@ import Base: +, -, *, /, ^
 #     (args...; kwargs...) -> f(args...; kwargs...) + c
 #     +(a, b) = +(b, a)`
 
-*(c, state) = State(0., state.basis, c .* state.coeffs, 0)
+*(c, state::State) = State(0., state.basis, c .* state.coeffs, 0)
 
-+(state, state′) = State(0., state.basis, state.coeffs .+ state′.coeffs, 0)
++(state::State, state′::State) = State(0., state.basis, state.coeffs .+ state′.coeffs, 0)
 
 δ(x,y) = ==(x,y)
 export δ

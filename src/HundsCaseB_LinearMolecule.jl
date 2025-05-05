@@ -131,6 +131,7 @@ function SpinRotation(state::HundsCaseB_LinearMolecule, state′::HundsCaseB_Lin
 end
 export SpinRotation
 
+### HYPERFINE INTERACTIONS ###
 function Hyperfine_IS(state::HundsCaseB_LinearMolecule, state′::HundsCaseB_LinearMolecule)
     # Fermi-contact interaction
     # Hirota, pg. 39
@@ -153,6 +154,7 @@ export Hyperfine_IS
 function Hyperfine_Dipolar(state::HundsCaseB_LinearMolecule, state′::HundsCaseB_LinearMolecule)
     # Dipolar interaction term, from c(Iz ⋅ Sz)
     # Hirota, pg. 39
+    # assume q = 0 for the sum
     v_1,  v_2,  v_3,  S,  I,  Λ,  ℓ,  K,  N,  J,  F,  M  = unpack(state)
     v_1′, v_2′, v_3′, S′, I′, Λ′, ℓ′, K′, N′, J′, F′, M′ = unpack(state′)
 
@@ -169,6 +171,40 @@ function Hyperfine_Dipolar(state::HundsCaseB_LinearMolecule, state′::HundsCase
     end
 end
 export Hyperfine_Dipolar
+
+function nuclear_quadrupole(state::HundsCaseB_LinearMolecule, state′::HundsCaseB_LinearMolecule)
+    # See Hirota, eq. (2.3.80)
+    # assume q = 0 for the sum
+    v_1,  v_2,  v_3,  S,  I,  Λ,  ℓ,  K,  N,  J,  F,  M  = unpack(state)
+    v_1′, v_2′, v_3′, S′, I′, Λ′, ℓ′, K′, N′, J′, F′, M′ = unpack(state′)
+    val = zero(Float64)
+    if delta(state, state′, :F, :M)
+        val += (
+            (1/4) * (-1)^(J+I+F) * (-1)^(N′+S+J) * ((I+1)*(2I+1)*(2I+3)/(I*(I+1)))^(1/2)
+            * ((2J′+1)*(2J+1)*(2N′+1)*(2N+1))^(1/2)
+            * wigner6j(I, J′, F, J, I, 2)
+            * wigner6j(N′, J′, S, J, N, 2)
+            * (-1)^(N′-K′) * wigner3j(N′, 2, N, -K′, 0, K)
+        )
+    end
+    return val
+end
+export nuclear_quadrupole
+
+function magnetic_quadrupole(state::HundsCaseB_LinearMolecule, state′::HundsCaseB_LinearMolecule)
+    # See Hirota, eq. (2.3.80)
+    # assume q = 0 for the sum
+    v_1,  v_2,  v_3,  S,  I,  Λ,  ℓ,  K,  N,  J,  F,  M  = unpack(state)
+    v_1′, v_2′, v_3′, S′, I′, Λ′, ℓ′, K′, N′, J′, F′, M′ = unpack(state′)
+    val = zero(Float64)
+    if delta(state, state′, :F, :M)
+        val += (
+            (1/2) * (F*(F+1) - J*(J+1) - I*(I+1))
+        )
+    end
+    return val
+end
+export magnetic_quadrupole
 
 function ℓDoubling(state::HundsCaseB_LinearMolecule, state′::HundsCaseB_LinearMolecule)
     v_1,  v_2,  v_3,  S,  I,  Λ,  ℓ,  K,  N,  J,  F,  M  = unpack(state)
@@ -245,23 +281,38 @@ function Zeeman(state::HundsCaseB_LinearMolecule, state′::HundsCaseB_LinearMol
 end
 export Zeeman
 
-# function Zeeman(state::HundsCaseB, state′::HundsCaseB, B::Vector{Float64})
-#     # Hirota, equation (2.5.16) and (2.5.19)
-#     S,  I,  Λ,  N,  J,  F,  M  = unpack(state)
-#     S′, I′, Λ′, N′, J′, F′, M′ = unpack(state′)
-#     if ~δ(Λ, Λ′) || ~δ(N, N′)
-#         return 0.0
-#     else
-#         return (
-#                   (-1)^(J′ + I + F + 1) * sqrt( (2F + 1) * (2F′ + 1) ) * wigner6j(J′, F′, I, F, J, 1)
-#                 * (-1)^(N + S + J′ + 1) * sqrt( (2J + 1) * (2J′ + 1) * S * (S + 1) * (2S + 1) ) * wigner6j(S, J′, N, J, S, 1)
-#             ) * 
-#             sum(
-#                 B[p+2] * (-1)^p * (-1)^(F′ - M′) * wigner3j(F′, 1, F, -M′, -p, M) for p ∈ -1:1
-#             )
-#     end
-# end
-# export Zeeman
+function zeeman_nuclear(state::HundsCaseB_LinearMolecule, state′::HundsCaseB_LinearMolecule, p::Int64)
+    # eq. (8.18) in Brown & Carrington
+    v_1,  v_2,  v_3,  S,  I,  Λ,  ℓ,  K,  N,  J,  F,  M  = unpack(state)
+    v_1′, v_2′, v_3′, S′, I′, Λ′, ℓ′, K′, N′, J′, F′, M′ = unpack(state′)
+    if ~delta(state, state′, :ℓ, :Λ, :K, :N)
+        return 0.0
+    else
+        return (
+            (-1)^p * (-1)^(F - M) * wigner3j(F, 1, F′, -M, p, M′) * (-1)^(J + I + F + 1) # (-1)^(J + I + F′ + 1)
+            * sqrt( (2F + 1) * (2F′ + 1) ) * wigner6j(I, F′, J, F, I, 1)
+            * sqrt( I * (I + 1) * (2I + 1) )
+            # (-1)^p * (-1)^(F - M) * wigner3j(F, 1, F′, -M, p, M′) * (-1)^(J + I + F′ + 1)
+            # * sqrt( (2F + 1) * (2F′ + 1) ) * wigner6j(J′, F′, I, F, J, 1)
+            # * sqrt( I * (I + 1) * (2I + 1) )
+        )
+    end
+end
+export zeeman_nuclear
+
+function zeeman_rotation(state::HundsCaseB_LinearMolecule, state′::HundsCaseB_LinearMolecule, p::Int64)
+    # eq. (8.18) in Brown & Carrington
+    v_1,  v_2,  v_3,  S,  I,  Λ,  ℓ,  K,  N,  J,  F,  M  = unpack(state)
+    v_1′, v_2′, v_3′, S′, I′, Λ′, ℓ′, K′, N′, J′, F′, M′ = unpack(state′)
+    if ~delta(state, state′, :Λ, :ℓ, :K, :N, :J, :F, :M)
+        return 0.0
+    else
+        return (
+            M
+        )
+    end
+end
+export zeeman_rotation
 
 function Σ(state::HundsCaseB_LinearMolecule)
     @unpack Λ, N, S, J = state
