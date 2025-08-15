@@ -11,6 +11,7 @@ Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 HalfIntegers = "f0d1745a-41c9-11e9-1dd9-e5d34d218721"
 IJulia = "7073ff75-c697-5162-941a-fcdaad2a7d2a"
 InfiniteArrays = "4858937d-0d70-526a-a4dd-2d5cb5dd786c"
+Kronecker = "2c470bb0-bcc8-11e8-3dad-c9649493f05e"
 LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 LoopVectorization = "bdcacae8-1622-11e9-2a5c-532679323890"
@@ -27,4 +28,5 @@ WignerSymbols = "9f57e263-0b3d-5e2e-b1be-24f2bb48858b"
 WignerSymbols_Simple = "6f4d8845-3f91-4d66-b298-731c1c4e9a06"
 
 [compat]
+Kronecker = "0.5.5"
 julia = "1"

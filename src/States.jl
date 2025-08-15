@@ -485,7 +485,7 @@ function tracked_idxs!(overlaps, states, prev_states, tracked_idxs)
 end
 export tracked_idxs!
 
-function subspace(states::Vector{State{T}}, QN_bounds, threshold=0.01) where {T}
+function subspace(states::Vector{State{T}}, QN_bounds, threshold=0.01) where {T<:BasisState}
     subspace = State{T}[]
     subspace_idxs = Int64[]
     QNs = keys(QN_bounds)

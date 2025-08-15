@@ -15,12 +15,12 @@ export Hamiltonian
 """
     Combines a list of Hamiltonians into a single Hamiltonian object.
 """
-mutable struct CombinedHamiltonian{T<:BasisState, F}
-    Hs::Vector{Hamiltonian{T}}
-    basis::Vector{T}
+mutable struct CombinedHamiltonian{T1, T2<:BasisState, F}
+    Hs::Vector{T1}
+    basis::Vector{T2}
     operator::Expr
     parameters::ParameterList
-    states::Vector{State{T}}
+    states::Vector{State{T2}}
     operators::F
     matrix::Matrix{ComplexF64}
     tdms::Array{ComplexF64, 3}
@@ -427,7 +427,7 @@ function evaluate!(H::CombinedHamiltonian)
 end
 export evaluate!
 
-import LinearAlgebra: Hermitian, eigen
+import LinearAlgebra: Hermitian, eigen, eigvals!
 function solve!(H, idxs=1:length(H.states))
     es, vs = eigen(Hermitian(H.matrix), idxs)
     for i ∈ idxs

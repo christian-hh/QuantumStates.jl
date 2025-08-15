@@ -69,7 +69,7 @@ function Base.show(io::IO, m::MIME"text/latex", state::State{T}) where T
     for (i, coeff) in enumerate(coeffs)
         str = "\$\$"
         basis_state = basis[i]
-        if norm(coeff)^2 > 1e-4
+        if norm(coeff)^2 > 1e-2
             plus_sign = true
             state_str = ""
             real_val = string(round(real(coeff), digits=3))

@@ -31,3 +31,44 @@ function Identity(state::ProductState, state′::ProductState)
     return state == state′
 end
 export Identity
+
+function subspace(states::Vector{State{ProductState{T1,T2}}}, QN_bounds1, QN_bounds2, threshold=0.01) where {T1<:BasisState,T2<:BasisState}
+    subspace = State{ProductState{T1,T2}}[]
+    subspace_idxs = Int64[]
+    add_to_subspace = ones(Bool, length(states))
+
+    QNs = keys(QN_bounds1)
+    for QN ∈ QNs
+        for (i, state) ∈ enumerate(states)
+            for (j, coeff) ∈ enumerate(state.coeffs)
+                if getfield(state.basis[j].basis_state1, QN) ∉ QN_bounds1[QN]
+                    if norm(coeff)^2 > threshold
+                        add_to_subspace[i] = false
+                    end
+                end
+            end
+        end
+    end
+
+    QNs = keys(QN_bounds2)
+    for QN ∈ QNs
+        for (i, state) ∈ enumerate(states)
+            for (j, coeff) ∈ enumerate(state.coeffs)
+                if getfield(state.basis[j].basis_state2, QN) ∉ QN_bounds2[QN]
+                    if norm(coeff)^2 > threshold
+                        add_to_subspace[i] = false
+                    end
+                end
+            end
+        end
+    end
+
+    for i ∈ eachindex(states)
+        if add_to_subspace[i]
+            push!(subspace, states[i])
+            push!(subspace_idxs, i)
+        end
+    end
+    return (subspace_idxs, subspace)
+end
+export subspace

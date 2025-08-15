@@ -40,9 +40,7 @@ end
 export HundsCaseB_LinearMolecule
 
 function overlap(state::HundsCaseB, state′::HundsCaseB)
-    S, I, Λ, N, J, F, M = unpack(state)
-    S′, I′, Λ′, N′, J′, F′, M′ = unpack(state′)
-    return δ(S,S′) * δ(I,I′) * δ(Λ,Λ′) * δ(N,N′) * δ(J,J′) * δ(F,F′) * δ(M,M′)
+    unpack(state) == unpack(state′)
 end
 export overlap
 
